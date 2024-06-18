@@ -2,7 +2,7 @@
  * @Author: 姚潘涛
  * @Date: 2024-06-14 10:03:17
  * @LastEditors: 姚潘涛
- * @LastEditTime: 2024-06-18 10:15:20
+ * @LastEditTime: 2024-06-18 15:11:08
  * @Description:
  *
  * Copyright (c) 2024 by pandaman, All Rights Reserved.
@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     // 用于存储命令行选项的解析结果
     int optc = 0;
     // 视频文件的基础路径
-    std::filesystem::path video_path_base;
+    std::string video_path_base;
     // 存储摄像头ID的集合
     std::vector<int> camera_ids;
     // 标志位，用于判断是否获取所有图像
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
         switch (optc) {
         case 'd':
             // 设置视频文件的基础路径
-            video_path_base = std::filesystem::path(optarg);
+            video_path_base = std::string(optarg);
             printf("video_path_base: %s\n", video_path_base.c_str());
             break;
         case 'n':

@@ -1,14 +1,14 @@
 #include "stage/tag_poses_set.h"
 #include "utils/utils.h"
 #include <Eigen/Eigen>
-#include <filesystem>
+#include <boost/filesystem.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/opencv.hpp>
 #include <unistd.h>
 
 int main(int argc, char** argv) {
     // 初始化变量
-    std::filesystem::path video_dir;   // 视频目录路径
+    boost::filesystem::path video_dir;   // 视频目录路径
     std::vector<int> valid_num;        // 有效计数
     std::vector<int> useful_tags;      // 有用的标签
     std::vector<int> camera_ids;       // 摄像机ID列表
@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     while ((optc = getopt(argc, argv, "t:d:n:")) != -1) {
         switch (optc) {
         case 'd':   // 视频目录选项
-            video_dir = std::filesystem::path(optarg);
+            video_dir = boost::filesystem::path(optarg);
             break;
         case 'n':   // 摄像机ID选项
             camera_ids.push_back(atoi(optarg));
@@ -43,16 +43,15 @@ int main(int argc, char** argv) {
     // 遍历每个相机ID
     for (int camera_id : camera_ids) {
         // 构建相机姿态文件的基础路径
-        std::filesystem::path pose_file_base(video_dir);
+        boost::filesystem::path pose_file_base(video_dir);
         pose_file_base.append("camera_calib");
         pose_file_base.append("poses");
 
         // 遍历姿态文件列表
-        std::filesystem::directory_iterator pose_file_list(pose_file_base);
-        for (auto& filepath : pose_file_list) {
+        for (auto& filepath : boost::filesystem::directory_iterator(pose_file_base)) {
             cv::FileStorage fs;
             // 打开文件存储
-            if (!fs.open(filepath.path(), cv::FileStorage::READ)) {
+            if (!fs.open(filepath.path().string(), cv::FileStorage::READ)) {
                 printf("cannot open file %s\n", filepath.path().c_str());
                 exit(0);
             }
@@ -115,9 +114,9 @@ int main(int argc, char** argv) {
 
     // 计算平均旋转和平移
     cv::FileStorage fs;
-    std::filesystem::path fs_path(video_dir);
+    boost::filesystem::path fs_path(video_dir);
     fs_path.append("ground.yaml");
-    if (!fs.open(fs_path, cv::FileStorage::WRITE)) {
+    if (!fs.open(fs_path.string(), cv::FileStorage::WRITE)) {
         printf("cannot open %s\n", fs_path.c_str());
     }
 

@@ -11,7 +11,7 @@
 
 int main(int argc, char** argv) {
     int optc = 0;
-    std::filesystem::path video_path_base;
+    std::string video_path_base;
     std::vector<int> camera_ids;
     bool flag_get_all_image = false;
     float new_size_factor   = 1.2;
@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     while ((optc = getopt(argc, argv, "d:n:f:b:")) != -1) {
         switch (optc) {
         case 'd':
-            video_path_base = std::filesystem::path(optarg);
+            video_path_base = std::string(optarg);
             printf("video_path_base: %s\n", video_path_base.c_str());
             break;
         case 'n':

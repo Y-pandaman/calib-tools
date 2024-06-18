@@ -2,7 +2,7 @@
  * @Author: 姚潘涛
  * @Date: 2024-06-14 10:03:17
  * @LastEditors: 姚潘涛
- * @LastEditTime: 2024-06-18 09:53:41
+ * @LastEditTime: 2024-06-18 15:56:41
  * @Description:
  *
  * Copyright (c) 2024 by pandaman, All Rights Reserved.
@@ -16,12 +16,12 @@
 
 int main(int argc, char** argv) {
     int optc;
-    std::filesystem::path path_base;
+    std::string path_base;
     int camera_id = 1;
     while ((optc = getopt(argc, argv, "d:n:")) != -1) {
         switch (optc) {
         case 'd':
-            path_base = std::filesystem::path(optarg);
+            path_base = std::string(optarg);
             break;
         case 'n':
             camera_id = (atoi(optarg));
@@ -32,8 +32,7 @@ int main(int argc, char** argv) {
     }
 
     cv::FileStorage fs;
-    std::filesystem::path poses_dir(path_base);
-    if (poses_dir.empty()) {
+    if (path_base.empty()) {
         std::cout << "poses_dir is empty" << std::endl;
         return 0;
     }
@@ -42,9 +41,7 @@ int main(int argc, char** argv) {
         cv::viz::Viz3d my_window("vis_ground");
         my_window.spinOnce();
         my_window.showWidget("worldAxes", cv::viz::WCoordinateSystem());
-        std::filesystem::path poses_file = poses_dir;
-        poses_file.append("camera_calib/poses/" + std::to_string(camera_id) +
-                          "-" + std::to_string(i) + ".png.yaml");
+                          std::string poses_file = path_base + "/camera_calib/poses/"+std::to_string(camera_id)+"-"+std::to_string(i)+".png.yaml";
         if (!fs.open(poses_file, cv::FileStorage::READ)) {
             printf("open %s error\n", poses_file.c_str());
             break;
@@ -63,8 +60,7 @@ int main(int argc, char** argv) {
         }
         fs.release();
 
-        std::filesystem::path ground_yaml(path_base);
-        ground_yaml.append("ground.yaml");
+        std::string ground_yaml = path_base + "/ground.yaml";
         if (!fs.open(ground_yaml, cv::FileStorage::READ)) {
             printf("open %s error\n", ground_yaml.c_str());
             break;

@@ -1,21 +1,24 @@
 #include "stage/tag_poses_set.h"
 #include "utils/utils.h"
 #include <Eigen/Eigen>
-#include <filesystem>
+#include <boost/filesystem.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/opencv.hpp>
 #include <unistd.h>
+#include <iostream>
+#include <vector>
+#include <string>
 
 /**
  * 获取目录中的文件数量
  * @param list
- * 一个std::filesystem::directory_iterator对象，指向目录中的第一个元素
+ * 一个boost::filesystem::directory_iterator对象，指向目录中的第一个元素
  * @return 目录中文件的数量
  *
  * 该函数通过遍历给定的目录迭代器，计算目录中的文件数量。
  * 它不包括子目录中的文件，只统计当前目录层级的文件。
  */
-int getFileNum(const std::filesystem::directory_iterator& list) {
+int getFileNum(const boost::filesystem::directory_iterator& list) {
     int result = 0;                 // 初始化文件计数器
     for (auto& filename : list) {   // 遍历目录中的每个文件
         result++;                   // 对每个文件进行计数
@@ -25,7 +28,7 @@ int getFileNum(const std::filesystem::directory_iterator& list) {
 
 int main(int argc, char** argv) {
     // 初始化路径基础变量和相机ID列表
-    std::filesystem::path path_base;
+    boost::filesystem::path path_base;
     std::vector<int> camera_ids;
 
     // 用于循环处理命令行参数
@@ -35,7 +38,7 @@ int main(int argc, char** argv) {
         case 'd':
             // 设置路径基础变量为命令行参数指定的路径
             // 文件路径
-            path_base = std::filesystem::path(optarg);
+            path_base = boost::filesystem::path(optarg);
             break;
         case 'n':
             // 将命令行参数指定的相机ID转换为整数并添加到相机ID列表中
@@ -60,11 +63,11 @@ int main(int argc, char** argv) {
     int valid_mat_num = 0;
 
     // 构建视频文件路径
-    std::filesystem::path video_path(path_base);
+    boost::filesystem::path video_path(path_base);
     // 存储每个相机的位姿目录路径
-    std::vector<std::filesystem::path> poses_dirs;
+    std::vector<boost::filesystem::path> poses_dirs;
     // 存储每个相机的位姿文件迭代器
-    std::vector<std::filesystem::directory_iterator> poses_lists;
+    std::vector<boost::filesystem::directory_iterator> poses_lists;
     // 初始化位姿文件数量为-1，用于后续计算和校验
     int poses_file_num = -1;
     // 遍历相机ID列表
@@ -103,7 +106,7 @@ int main(int argc, char** argv) {
         printf("================== pose_file_id = %d ===================\n", i);
 
         // 存储每个相机的位姿文件路径
-        std::vector<std::filesystem::path> pose_file_path;
+        std::vector<boost::filesystem::path> pose_file_path;
         // 存储每个相机的位姿集合
         std::vector<xict_calib::TagPosesSet> poses_set_list;
 
@@ -117,7 +120,7 @@ int main(int argc, char** argv) {
                                      std::to_string(i) + ".png.yaml");
 
             // 打开位姿文件
-            cv::FileStorage fs(pose_file_path[j], cv::FileStorage::READ);
+            cv::FileStorage fs(pose_file_path[j].string(), cv::FileStorage::READ);
             // 读取位姿数据
             xict_calib::TagPosesSet poses_set;
             printf("readFromFileStorage %s ....\n", pose_file_path[j].c_str());
@@ -192,7 +195,7 @@ int main(int argc, char** argv) {
             printf("=================================\n");
             valid_mat_num++;
             mean_rotate_vec += cur_rotate_vec;
-            std::cout << "cur_rotate_vec:\n" << cur_rotate_vec << std::endl;
+            std::cout << "cur_rotate_vec: " << cur_rotate_vec << std::endl;
             mean_trans_vec += trans_vec;
         }
     }
@@ -226,9 +229,7 @@ int main(int argc, char** argv) {
     std::cout << "result_matrix:\n" << result_matrix << std::endl;
 
     // 构建文件路径并打开文件存储
-    std::filesystem::path fs_path(path_base);
-    fs_path.append("camera_extrin_" + std::to_string(camera_ids[camera_x]) +
-                   "_and_" + std::to_string(camera_ids[camera_y]) + ".yaml");
+    std::string fs_path = path_base.string() + "/camera_extrin_" + std::to_string(camera_ids[camera_x])+"_and_"+std::to_string(camera_ids[camera_y])+".yaml";
     cv::FileStorage fs(fs_path, cv::FileStorage::Mode::WRITE);
 
     // 将结果矩阵转换为OpenCV的Mat格式，并写入文件

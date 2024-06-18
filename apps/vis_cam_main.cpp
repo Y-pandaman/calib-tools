@@ -2,7 +2,7 @@
  * @Author: 姚潘涛
  * @Date: 2024-06-14 10:03:17
  * @LastEditors: 姚潘涛
- * @LastEditTime: 2024-06-18 10:15:59
+ * @LastEditTime: 2024-06-18 15:30:26
  * @Description:
  *
  * Copyright (c) 2024 by pandaman, All Rights Reserved.
@@ -24,7 +24,7 @@ void drawPlane(const cv::Mat& mat_matrix, cv::viz::Viz3d& window,
 
 int main(int argc, char** argv) {
     int optc;
-    std::filesystem::path camera_extrin_fs_path, ground_fs_path;
+    std::string camera_extrin_fs_path, ground_fs_path;
     int front_camera_id, back_camera_id;
     while ((optc = getopt(argc, argv, "f:b:d:g:")) != -1) {
         switch (optc) {
@@ -37,10 +37,10 @@ int main(int argc, char** argv) {
             back_camera_id = atoi(optarg);
             break;
         case 'd':
-            camera_extrin_fs_path = std::filesystem::path(optarg);
+            camera_extrin_fs_path = std::string(optarg);
             break;
         case 'g':
-            ground_fs_path = std::filesystem::path(optarg);
+            ground_fs_path = std::string(optarg);
             break;
         default:
             break;

@@ -341,33 +341,32 @@ namespace xict_calib {
     void UndistortVideo(std::string video_path, int camera_idx,
                         float new_size_factor, float balance) {
         // 初始化畸变矩阵与系数矩阵
-        cv::Mat Ka = cv::Mat::eye(3, 3, CV_64F);   // 创建初始摄像机内参矩阵
-        cv::Mat Da = cv::Mat::ones(1, 4, CV_64F);   // 创建畸变系数矩阵
+        cv::Mat Ka = cv::Mat::eye(3, 3, CV_64F);
+        cv::Mat Da = cv::Mat::ones(1, 4, CV_64F);
 
         // 读取YAML文件获取内参、图像尺寸等信息
         cv::Size image_size;
-        std::filesystem::path fs_path(video_path);
+        boost::filesystem::path fs_path(video_path);
         fs_path = fs_path.parent_path();
-        fs_path.append("camera_" + std::to_string(camera_idx) + "_intrin.yaml");
-        cv::FileStorage fs(fs_path, cv::FileStorage::READ);
+        fs_path /= "camera_" + std::to_string(camera_idx) + "_intrin.yaml";
+        cv::FileStorage fs(fs_path.string(), cv::FileStorage::READ);
         fs["K"] >> Ka;
         fs["D"] >> Da;
         fs["image_size"] >> image_size;
+        fs.release();
 
         // 计算新的视频尺寸
         cv::Size new_size(image_size.width * new_size_factor,
                           image_size.height * new_size_factor);
-        fs.release();
 
         // 输出读取到的内参、畸变系数及原始图像尺寸信息
-        std::cout << Ka << std::endl;
-        std::cout << Da << std::endl;
-        std::cout << image_size << std::endl;
+        std::cout << "Intrinsics (Ka):\n" << Ka << std::endl;
+        std::cout << "Distortion Coefficients (Da):\n" << Da << std::endl;
+        std::cout << "Image Size:\n" << image_size << std::endl;
 
         // 估计用于校正畸变的新摄像机矩阵，初始化映射
         cv::Mat eye_mat = cv::Mat::eye(3, 3, CV_32F);
-        cv::Mat map1, map2;
-        cv::Mat new_Ka;
+        cv::Mat map1, map2, new_Ka;
         cv::fisheye::estimateNewCameraMatrixForUndistortRectify(
             Ka, Da, image_size, eye_mat, new_Ka, balance, new_size);
         cv::fisheye::initUndistortRectifyMap(Ka, Da, eye_mat, new_Ka, new_size,
@@ -375,18 +374,18 @@ namespace xict_calib {
 
         // 输出新摄像机内参矩阵并保存至YAML文件
         fs_path = fs_path.parent_path();
-        fs_path.append("camera_" + std::to_string(camera_idx) +
-                       "_intrin_undistort.yaml");
-        fs = cv::FileStorage(fs_path.string(), cv::FileStorage::WRITE);
+        fs_path /=
+            "camera_" + std::to_string(camera_idx) + "_intrin_undistort.yaml";
+        fs.open(fs_path.string(), cv::FileStorage::WRITE);
         fs << "K" << new_Ka << "D" << Da << "image_size" << new_size;
         fs.release();
 
         // 准备输出视频文件
         cv::VideoWriter output_video;
-        std::filesystem::path output_video_path(video_path);
+        boost::filesystem::path output_video_path(video_path);
         output_video_path = output_video_path.parent_path();
-        output_video_path.append(std::to_string(camera_idx) + "_undistort.avi");
-        output_video.open(output_video_path,
+        output_video_path /= std::to_string(camera_idx) + "_undistort.avi";
+        output_video.open(output_video_path.string(),
                           cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 30,
                           new_size, true);
 
@@ -403,11 +402,10 @@ namespace xict_calib {
             if (count == 0) {
                 mask_image = cv::Mat::ones(color_image.size(), CV_8UC1) * 255;
                 cv::remap(mask_image, mask_image, map1, map2, cv::INTER_LINEAR);
-                std::filesystem::path mask_image_path(video_path);
+                boost::filesystem::path mask_image_path(video_path);
                 mask_image_path = mask_image_path.parent_path();
-                mask_image_path.append(std::to_string(camera_idx) +
-                                       "_mask.png");
-                cv::imwrite(mask_image_path, mask_image);
+                mask_image_path /= std::to_string(camera_idx) + "_mask.png";
+                cv::imwrite(mask_image_path.string(), mask_image);
             }
             std::cout << count++ << "\r";
         }

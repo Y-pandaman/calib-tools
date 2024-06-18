@@ -2,7 +2,7 @@
  * @Author: 姚潘涛
  * @Date: 2024-06-14 10:03:17
  * @LastEditors: 姚潘涛
- * @LastEditTime: 2024-06-18 11:57:58
+ * @LastEditTime: 2024-06-18 16:33:22
  * @Description:
  *
  * Copyright (c) 2024 by pandaman, All Rights Reserved.
@@ -12,7 +12,6 @@
 #include "utils/math_utils.h"
 #include <Eigen/Eigen>
 #include <opencv2/opencv.hpp>
-// #include <visp3/core/vpHomogeneousMatrix.h>
 #include <visp3/core/vpPixelMeterConversion.h>
 #include <visp3/core/vpPoint.h>
 #include <visp3/core/vpXmlParserCamera.h>
