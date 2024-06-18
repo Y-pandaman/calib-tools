@@ -1,0 +1,6 @@
+build/
+*.avi
+*.mp4
+*.onnx
+*.log
+*.png
