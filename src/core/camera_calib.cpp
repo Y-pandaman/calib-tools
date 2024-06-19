@@ -1,15 +1,5 @@
 ﻿#include "core/camera_calib.h"
 namespace xict_calib {
-    /**
-     * 计算两个图像的差异分数。
-     *
-     * 该函数通过比较两个图像的每个像素值的差异，并计算这些差异值的平均值，来评估两个图像的相似度。
-     * 差异分数越小，表示两个图像越相似；差异分数越大，表示两个图像越不相似。
-     *
-     * @param img_1 第一个图像，是一个CV_8UC1类型的OpenCV Mat对象。
-     * @param img_2 第二个图像，是一个CV_8UC1类型的OpenCV Mat对象。
-     * @return 返回两个图像的差异分数，这是一个浮点数，范围在0到255之间。
-     */
     float DiffScore(const cv::Mat_<uchar>& img_1,
                     const cv::Mat_<uchar>& img_2) {
         float diff_value = 0.0f;   // 初始化差异值累加器。
@@ -27,18 +17,6 @@ namespace xict_calib {
         return diff_value;   // 返回差异分数。
     }
 
-    /**
-     * 从视频中提取不模糊的图像
-     *
-     * @param images_dir 存储提取图像的目录
-     * @param video_path 视频文件的路径
-     * @param camera_idx 摄像头的索引，用于图像命名
-     * @param noblur_image_idx_vec 存储不模糊图像索引的向量
-     * @param motion_threshold 运动阈值，用于判断图像是否模糊
-     * @param local_mini_stride 局部最小帧间隔，用于确定存储图像的频率
-     * @param image_base_count 图像基础计数，用于图像命名
-     * @return 返回更新后的不模糊图像索引向量
-     */
     std::vector<int> ExtractNoBlurImagesFromVideo(
         std::string images_dir, std::string video_path, int camera_idx,
         std::vector<int> noblur_image_idx_vec, float motion_threshold,
@@ -144,16 +122,6 @@ namespace xict_calib {
         return noblur_image_idx_vec;   // 返回更新后的不模糊图像索引向量
     }
 
-    /**
-     * 从视频中提取图像并保存到指定目录。
-     *
-     * @param images_dir 保存提取图像的目录路径。
-     * @param video_path 视频文件的路径。
-     * @param camera_idx 摄像头索引，用于在文件名中区分不同摄像头的数据。
-     *
-     * 此函数首先创建指定的图像保存目录，然后打开视频文件，逐帧读取视频中的彩色图像，
-     * 并将每帧图像保存为PNG格式的文件，文件名包含帧编号和摄像头索引。
-     */
     void ExtractImagesFromVideo(std::string images_dir, std::string video_path,
                                 int camera_idx) {
         // 初始化用于读取视频的OpenCV对象
@@ -184,12 +152,6 @@ namespace xict_calib {
         }
     }
 
-    /**
-     * @brief FishEyeCameraCalib 大致功能是进行鱼眼相机的校准。
-     *
-     * @param images_dir 图像目录，包含用于校准的图像。
-     * @param camera_idx 相机索引，用于区分不同的相机。
-     */
     void FisheyeCameraCalib(std::string images_dir, int camera_idx) {
         // 校准板的行数和列数
         int pattern_rows = 6;
@@ -325,19 +287,6 @@ namespace xict_calib {
         }
     }
 
-    /**
-     * 视频去畸变处理函数。
-     *
-     * 功能描述：该函数从指定的YAML文件中读取相机内参信息，计算用于校正畸变的新摄像机矩阵，
-     * 初始化映射以进行畸变矫正，并将此映射应用于视频中的每一帧以进行畸变校正处理。
-     * 最终输出校正后的视频及对应的掩模图像（首帧）至指定路径。
-     *
-     * @param video_path 输入视频文件的路径。
-     * @param camera_idx
-     * 相机的索引编号，用于构建读取/保存相关参数文件的名称。
-     * @param new_size_factor 新视频大小相对于原视频的缩放因子。
-     * @param balance 用于计算新摄像机矩阵的平衡参数，影响校正区域的大小。
-     */
     void UndistortVideo(std::string video_path, int camera_idx,
                         float new_size_factor, float balance) {
         // 初始化畸变矩阵与系数矩阵
@@ -415,22 +364,6 @@ namespace xict_calib {
         output_video.release();
     }
 
-    /**
-     * @brief 对每个视图进行校准，转换到空中视图
-     *
-     * 本函数的目的是通过检测图像中的AprilTag标记，来建立地面视图和空中视图之间的映射关系。
-     * 它首先初始化AprilTag检测器，然后循环处理每对对应的地面视图和空中视图图像。在每对图像中，
-     * 它检测AprilTag的位置，并尝试匹配来自两幅图像的标签。一旦找到足够的匹配点，它使用这些点
-     * 来计算一个 homography（ homography
-     * 是一种用于平面场景中图像之间映射的几何变换矩阵）。 最后，它将这个
-     * homography 存储起来，用于将地面视图转换为空中视图。
-     *
-     * @param images_dir 地面视图图像的目录
-     * @param airview_images_dir 空中视图图像的目录
-     * @param camera_idx 相机索引，用于标识特定的相机
-     * @param target_w_ 空中视图的目标宽度
-     * @param target_h_ 空中视图的目标高度
-     */
     void CalibEachViewToAirView(std::string images_dir,
                                 std::string airview_images_dir, int camera_idx,
                                 int target_w_, int target_h_) {
@@ -449,7 +382,7 @@ namespace xict_calib {
             sprintf(name, (images_dir + "%d-%d.png").c_str(), camera_idx, i);
             // 读取地面视图图像
             cv::Mat color_image_0 = cv::imread(name);
-            sprintf(name, (airview_images_dir + "/airview.jpg").c_str(), 0, i);
+            sprintf(name, (airview_images_dir + "airview.jpg").c_str(), 0, i);
             // 读取空中视图图像
             cv::Mat temp_color_image_1 = cv::imread(name);
             cv::Mat color_image_1      = temp_color_image_1;
@@ -459,8 +392,10 @@ namespace xict_calib {
             int target_h = target_h_;
 
             // 检查图像是否为空，如果是则退出循环
-            if (color_image_0.rows == 0 || color_image_1.rows == 0)
+            if (color_image_0.rows == 0 || color_image_1.rows == 0) {
+                std::cout << "No more images" << std::endl;
                 break;
+            }
 
             // 转换图像到灰度
             cv::Mat gray_image_0, gray_image_1;
@@ -479,37 +414,9 @@ namespace xict_calib {
             std::vector<cv::Point2f> match_points_0, match_points_1;
 
             // 检测图像中的AprilTags
-            std::cout << "-----------------------" << std::endl;
             std::map<int, std::vector<float2> >::iterator iter;
             apriltag_detector.Detect(points_0, color_image_0);
             apriltag_detector.Detect(points_1, color_image_1);
-
-            // 在图像中绘制检测到的AprilTags
-            for (iter = points_0.begin(); iter != points_0.end(); ++iter) {
-                for (int i = 0; i < points_0[iter->first].size(); ++i) {
-                    cv::circle(color_image_0,
-                               cv::Point2f(points_0[iter->first][i].x,
-                                           points_0[iter->first][i].y),
-                               15, cv::Scalar(0, 0, 255), 12);
-                }
-            }
-            for (iter = points_1.begin(); iter != points_1.end(); ++iter) {
-                for (int i = 0; i < points_1[iter->first].size(); ++i) {
-                    cv::circle(color_image_1,
-                               cv::Point2f(points_1[iter->first][i].x,
-                                           points_1[iter->first][i].y),
-                               15, cv::Scalar(0, 0, 255), 12);
-                }
-            }
-
-            // 缩小图像以供显示
-            cv::Mat vis_color_image_0, vis_color_image_1;
-            cv::resize(
-                color_image_0, vis_color_image_0,
-                cv::Size(color_image_0.cols / 4, color_image_0.rows / 4));
-            cv::resize(
-                color_image_1, vis_color_image_1,
-                cv::Size(color_image_1.cols / 4, color_image_1.rows / 4));
 
             // 遍历空中视图中的标签，寻找匹配的地面视图标签
             std::map<int, std::vector<float2> >::iterator match_iter;
@@ -519,9 +426,6 @@ namespace xict_calib {
 
                 if ((match_iter = points_0.find(iter->first)) !=
                     points_0.end()) {
-                    std::cout << match_iter->first << std::endl;
-                    std::cout << points_0[match_iter->first].size()
-                              << std::endl;
                     for (int i = 0; i < points_0[match_iter->first].size();
                          ++i) {   // points_0 环视相机拍摄图像上的点
                         match_points_0.emplace_back(cv::Point2f(
@@ -538,30 +442,9 @@ namespace xict_calib {
                     }
                 }
             }
-            std::cout << std::endl;
-            std::cout << "-----------------------" << std::endl;
 
-            vis_color_image_1 =
-                cv::Mat::zeros(temp_color_image_1.rows * 2,
-                               temp_color_image_1.cols * 2, CV_8UC3);
-            temp_color_image_1.copyTo(vis_color_image_1(cv::Rect(
-                temp_color_image_1.cols / 2, temp_color_image_1.rows / 2,
-                temp_color_image_1.cols, temp_color_image_1.rows)));
             // 在图像中绘制匹配的点
             if (match_points_1.size() > 0) {
-                for (int i = 0; i < match_points_0.size(); ++i) {
-                    cv::circle(color_image_0, match_points_0[i], 15,
-                               cv::Scalar(0, 255, 255), 12);
-                    cv::circle(vis_color_image_1, match_points_1[i], 15,
-                               cv::Scalar(0, 255, 255), 12);
-                }
-                cv::Mat vis_color_image_0;
-                cv::resize(
-                    color_image_0, vis_color_image_0,
-                    cv::Size(color_image_0.cols / 4, color_image_0.rows / 4));
-                cv::resize(vis_color_image_1, vis_color_image_1,
-                           cv::Size(vis_color_image_1.cols / 4,
-                                    vis_color_image_1.rows / 4));
                 // 计算两幅图像之间的homography
                 cv::Mat H =
                     cv::findHomography(match_points_0, match_points_1, cv::RHO);
@@ -573,27 +456,12 @@ namespace xict_calib {
                                    cv::FileStorage::WRITE);
                 fs << "H" << H;
                 fs.release();
-                printf("fs output H done\n");
+                printf("fs output H done!!!\n");
                 return;
             }
         }
     }
 
-    /**
-     * @brief 测试图像拼接过程中的融合算法
-     *
-     * 该函数通过给定一组图像、对应的掩模以及变换矩阵，实现图像的拼接融合。
-     * 具体步骤包括：
-     * 1. 初始化融合图像和权重图像。
-     * 2. 对于每张图像，根据变换矩阵将其变形并融合到融合图像中。
-     * 3. 计算每像素的加权平均值，得到最终的融合图像。
-     *
-     * @param images 输入的图像数组。
-     * @param masks 对应的图像掩模数组，用于指定每像素的融合权重。
-     * @param Hs 图像之间的变换矩阵数组。
-     * @param tgt_w_ 目标图像的宽度。
-     * @param tgt_h_ 目标图像的高度。
-     */
     void TestStitching(std::vector<cv::Mat> images, std::vector<cv::Mat> masks,
                        std::vector<cv::Mat> Hs, int tgt_w_, int tgt_h_) {
         // 初始化融合图像和权重图像

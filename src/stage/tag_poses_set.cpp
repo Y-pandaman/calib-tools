@@ -9,14 +9,6 @@
  */
 #include "stage/tag_poses_set.h"
 namespace xict_calib {
-    /**
-     * 从OpenCV的文件存储对象中读取标签姿势数据。
-     * @param fs 文件存储对象，包含标签姿势的数据。
-     * @return 总是返回true，表示读取操作始终成功。
-     *
-     * 此函数从给定的文件存储对象中读取标签的姿势数据，包括每个标签的矩阵和ID。
-     * 它首先读取标签的总数，然后循环读取每个标签的姿势矩阵和ID，并将它们添加到相应的列表中。
-     */
     bool TagPosesSet::ReadFromFileStorage(const cv::FileStorage& fs) {
         // 从文件存储中读取标签的总数
         fs["poses_num"] >> poses_num;

@@ -2,7 +2,7 @@
  * @Author: 姚潘涛
  * @Date: 2024-06-14 10:03:17
  * @LastEditors: 姚潘涛
- * @LastEditTime: 2024-06-18 15:11:08
+ * @LastEditTime: 2024-06-18 20:58:20
  * @Description:
  *
  * Copyright (c) 2024 by pandaman, All Rights Reserved.
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
         case 'd':
             // 设置视频文件的基础路径
             video_path_base = std::string(optarg);
-            printf("video_path_base: %s\n", video_path_base.c_str());
+            printf("video_path_base: %s\n", video_path_base);
             break;
         case 'n':
             // 添加摄像头ID到集合中

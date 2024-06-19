@@ -41,7 +41,9 @@ int main(int argc, char** argv) {
         cv::viz::Viz3d my_window("vis_ground");
         my_window.spinOnce();
         my_window.showWidget("worldAxes", cv::viz::WCoordinateSystem());
-                          std::string poses_file = path_base + "/camera_calib/poses/"+std::to_string(camera_id)+"-"+std::to_string(i)+".png.yaml";
+        std::string poses_file = path_base + "/camera_calib/poses/" +
+                                 std::to_string(camera_id) + "-" +
+                                 std::to_string(i) + ".png.yaml";
         if (!fs.open(poses_file, cv::FileStorage::READ)) {
             printf("open %s error\n", poses_file.c_str());
             break;
@@ -53,7 +55,7 @@ int main(int argc, char** argv) {
 
             fs["pose_" + std::to_string(j)] >> pose_mat;
             Eigen::Matrix4f inverted_matrix;
-            xict_calib::utils::InvertYInR(pose_mat, inverted_matrix);
+            xict_calib::Utils::InvertYInR(pose_mat, inverted_matrix);
             xict_calib::VizPainter::DrawAxis(inverted_matrix, my_window,
                                              std::to_string(axis_count), 1);
             axis_count++;

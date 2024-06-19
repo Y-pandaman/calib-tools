@@ -9,9 +9,9 @@
 int main(int argc, char** argv) {
     // 初始化变量
     boost::filesystem::path video_dir;   // 视频目录路径
-    std::vector<int> valid_num;        // 有效计数
-    std::vector<int> useful_tags;      // 有用的标签
-    std::vector<int> camera_ids;       // 摄像机ID列表
+    std::vector<int> valid_num;          // 有效计数
+    std::vector<int> useful_tags;        // 有用的标签
+    std::vector<int> camera_ids;         // 摄像机ID列表
     std::vector<Eigen::Vector3f> mean_trans_list,
         mean_weighted_axis_list;   // 平均平移和加权轴列表
 
@@ -48,7 +48,8 @@ int main(int argc, char** argv) {
         pose_file_base.append("poses");
 
         // 遍历姿态文件列表
-        for (auto& filepath : boost::filesystem::directory_iterator(pose_file_base)) {
+        for (auto& filepath :
+             boost::filesystem::directory_iterator(pose_file_base)) {
             cv::FileStorage fs;
             // 打开文件存储
             if (!fs.open(filepath.path().string(), cv::FileStorage::READ)) {
@@ -87,20 +88,20 @@ int main(int argc, char** argv) {
 
                 // 计算右手坐标系下的矩阵
                 Eigen::Matrix4f right_hand_matrix;
-                xict_calib::utils::InvertYInR(tag_poses_set.pose_matrix_list[i],
+                xict_calib::Utils::InvertYInR(tag_poses_set.pose_matrix_list[i],
                                               right_hand_matrix);
 
                 // 计算旋转角轴和平移量
                 Eigen::Vector3f trans;
                 Eigen::AngleAxisf angle_axis;
-                xict_calib::utils::GetAngleAxisAndTrans(right_hand_matrix,
+                xict_calib::Utils::GetAngleAxisAndTrans(right_hand_matrix,
                                                         angle_axis, trans);
                 printf("tag_id: %d\n", tag_id);
                 std::cout << "this trans: \n" << trans << std::endl;
 
                 // 加权平均角轴
                 Eigen::Vector3f tp_vec =
-                    xict_calib::utils::WeightAngleAxis(angle_axis);
+                    xict_calib::Utils::WeightAngleAxis(angle_axis);
                 mean_weighted_axis_list[useful_id] += tp_vec;
                 mean_trans_list[useful_id] += trans;
                 valid_num[useful_id]++;
